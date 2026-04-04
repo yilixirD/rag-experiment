@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>10-K RAG</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    h1 { font-size: 1.4rem; color: #111; }
+    p.subtitle { color: #555; font-size: 0.9rem; }
+
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    select, input[type="text"] {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      background: white;
+    }
+
+    select { min-width: 110px; }
+
+    #question {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    button {
+      padding: 0.5rem 1.25rem;
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #888;
+      cursor: not-allowed;
+    }
+
+    .answer-box {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.25rem;
+      min-height: 120px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      font-size: 0.95rem;
+      color: #222;
+    }
+
+    .answer-box.placeholder { color: #aaa; }
+
+    .error { color: #c00; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <h1>10-K RAG</h1>
+      <p class="subtitle">Ask questions about SEC 10-K annual filings.</p>
+    </div>
+
+    <div class="controls">
+      <select id="ticker">
+        <option value="aapl">AAPL</option>
+        <option value="amd">AMD</option>
+        <option value="avgo">AVGO</option>
+        <option value="ba">BA</option>
+        <option value="brka">BRK.A</option>
+        <option value="cost">COST</option>
+        <option value="crsp">CRSP</option>
+        <option value="dpz">DPZ</option>
+        <option value="goog">GOOG</option>
+        <option value="ibm">IBM</option>
+        <option value="intc">INTC</option>
+        <option value="isrg">ISRG</option>
+        <option value="meta">META</option>
+        <option value="mu">MU</option>
+        <option value="nvda">NVDA</option>
+        <option value="smr">SMR</option>
+        <option value="snps">SNPS</option>
+        <option value="tsla">TSLA</option>
+        <option value="unh">UNH</option>
+      </select>
+
+      <select id="section">
+        <option value="">All sections</option>
+        <option value="Item 1.">Item 1 — Business</option>
+        <option value="Item 1A.">Item 1A — Risk Factors</option>
+        <option value="Item 7.">Item 7 — MD&amp;A</option>
+        <option value="Item 7A.">Item 7A — Market Risk</option>
+        <option value="Item 8.">Item 8 — Financial Statements</option>
+      </select>
+
+      <input id="question" type="text" placeholder="Ask a question…" />
+      <button id="submit">Ask</button>
+    </div>
+
+    <div id="answer" class="answer-box placeholder">Answer will appear here.</div>
+  </div>
+
+  <script>
+    const submitBtn = document.getElementById('submit');
+    const answerBox = document.getElementById('answer');
+
+    async function ask() {
+      const question = document.getElementById('question').value.trim();
+      const ticker = document.getElementById('ticker').value;
+      const section = document.getElementById('section').value;
+
+      if (!question) return;
+
+      submitBtn.disabled = true;
+      answerBox.className = 'answer-box';
+      answerBox.textContent = '';
+
+      try {
+        const res = await fetch('/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question, ticker, section: section || null }),
+        });
+
+        if (!res.ok) {
+          answerBox.className = 'answer-box error';
+          answerBox.textContent = `Error: ${res.status} ${res.statusText}`;
+          return;
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          answerBox.textContent += decoder.decode(value, { stream: true });
+        }
+      } catch (err) {
+        answerBox.className = 'answer-box error';
+        answerBox.textContent = `Error: ${err.message}`;
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    submitBtn.addEventListener('click', ask);
+    document.getElementById('question').addEventListener('keydown', e => {
+      if (e.key === 'Enter') ask();
+    });
+  </script>
+</body>
+</html>

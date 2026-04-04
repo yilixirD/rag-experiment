@@ -139,7 +139,7 @@ class ChunkEmbed:
                     "source": str(path),
                     "doc_id": doc_id,
                     "emb_model": self.emb_model,
-                    "stock symbol": stock_sym,
+                    "stock_symbol": stock_sym,
                     "fiscal_year_end": fiscal_year_end,
                     "filing_date": filing_date,
                     "part": part,

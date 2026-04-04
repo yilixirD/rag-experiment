@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \":*)",
+      "Bash(uv run:*)",
+      "Bash(unset VIRTUAL_ENV)",
+      "Bash(pg_isready)",
+      "Bash(psql --version)",
+      "Bash(docker ps:*)",
+      "Bash(python -c \"import sys,json; d=json.loads\\(sys.stdin.readline\\(\\)\\); print\\(json.dumps\\({k: \\(v[:5] if k==''''embedding'''' else v\\) for k,v in d.items\\(\\)}, indent=2\\)\\)\")",
+      "Bash(python -c \"import langchain_postgres; print\\(langchain_postgres.__version__\\)\")",
+      "Bash(python -c ':*)",
+      "Bash(uv add:*)",
+      "Bash(curl -s -X POST http://localhost:8000/query -H 'Content-Type: application/json' -d '{\"question\":\"What are the main products?\",\"ticker\":\"aapl\"}' --max-time 30)",
+      "Bash(pkill -f \"uvicorn app.main\")",
+      "Bash(echo \"--- EXIT $? ---\")",
+      "Bash(netstat -ano)",
+      "Read(//c/Users/yixin/Documents/projects/rag-experiment/**)",
+      "Bash(xargs -I{} taskkill /PID {} /F)",
+      "Bash(taskkill /PID 10180 /F)",
+      "Bash(curl -s -X POST http://localhost:8080/query -H 'Content-Type: application/json' -d '{\"question\":\"What are the main products?\",\"ticker\":\"aapl\"}' --max-time 45)",
+      "Bash(echo \"--- CURL EXIT $? ---\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s -X POST http://localhost:9000/query -H 'Content-Type: application/json' -d '{\"question\":\"What are the main products?\",\"ticker\":\"aapl\"}' --max-time 45)",
+      "Bash(cmd /c \"taskkill /F /IM python.exe /T 2>nul\")",
+      "Bash(cmd /c \"taskkill /F /IM uvicorn.exe /T 2>nul\")",
+      "Bash(cmd /c 'wmic process where processid=__TRACKED_VAR__ get name,executablepath 2>nul')",
+      "Bash(grep -v \"^$\")",
+      "Bash(curl -s -X POST http://localhost:7777/query -H 'Content-Type: application/json' -d '{\"question\":\"What are the main products?\",\"ticker\":\"aapl\"}' --max-time 45)",
+      "Bash(curl -sv -X POST http://localhost:7777/query -H 'Content-Type: application/json' -d '{\"question\":\"What are the main products?\",\"ticker\":\"aapl\"}' --max-time 45)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:7888/static/index.html)",
+      "Bash(netsh int:*)"
+    ]
+  }
+}
