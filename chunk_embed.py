@@ -109,9 +109,12 @@ class ChunkEmbed:
         # Skip the Table of Contents by finding the SECOND occurrence of the
         # first section header. The TOC lists all Item headers near the top of
         # the file; the real content appears later with the same header text.
+        # Some filings have no TOC (only one occurrence) -- fall back to that
+        # single occurrence instead of wrapping to a negative find() start.
         first_header = SECTION_HEADERS[0]
         toc_hit = text.find(first_header)
-        content_start = text.find(first_header, toc_hit + 1) if toc_hit != -1 else 0
+        second_hit = text.find(first_header, toc_hit + 1) if toc_hit != -1 else -1
+        content_start = second_hit if second_hit != -1 else max(toc_hit, 0)
 
         # Find the start position of each section, searching forward from the
         # previous section's position so we never re-match the TOC.
